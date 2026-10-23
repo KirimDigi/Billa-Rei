@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Wedding of Billa &amp; Rei</title>
+    <script>
+        (function() {
+            var search = window.location.search || '';
+            var hash = window.location.hash || '';
+            var path = window.location.pathname || '';
+            var repoMatch = path.match(/^(\/[^\/]+)/);
+            var prefix = repoMatch ? repoMatch[1] : '';
+            if (prefix.toLowerCase() === '/billa-rei') {
+                window.location.replace(prefix + '/index.html' + search + hash);
+            } else {
+                window.location.replace('index.html' + search + hash);
+            }
+        })();
+    </script>
+</head>
+<body>
+    <p style="font-family: sans-serif; text-align: center; margin-top: 20%;">Mengarahkan...</p>
+</body>
+</html>

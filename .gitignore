@@ -1,0 +1,5 @@
+scratch_*.ps1
+scratch_*.js
+*.tmp
+.DS_Store
+Thumbs.db
