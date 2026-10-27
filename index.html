@@ -2159,9 +2159,9 @@ btn_gift.onclick = function(){
 
                 
                                         
-                    <audio id="song" loop="" preload="auto">
-                        <source src="MUARA%20-%20Adera%20(Official%20Video)%20%5BRm8UZWKFC2Y%5D.mp3" type="audio/mp3">
-                        <source src="MUARA - Adera (Official Video) [Rm8UZWKFC2Y].mp3" type="audio/mp3">
+                    <audio id="song" loop="" preload="auto" playsinline webkit-playsinline>
+                        <source src="MUARA%20-%20Adera%20(Official%20Video)%20%5BRm8UZWKFC2Y%5D.mp3?v=2" type="audio/mp3">
+                        <source src="MUARA - Adera (Official Video) [Rm8UZWKFC2Y].mp3?v=2" type="audio/mp3">
                     </audio>
 
                 
@@ -2621,11 +2621,17 @@ btn_gift.onclick = function(){
                         return;
                     }
 
-                    song.volume = 0;
+                    // On iOS Safari, song.volume is read-only (always 1) or changing it can cause play failure.
+                    // Set volume safely.
+                    try {
+                        song.volume = 1;
+                    } catch (e) {}
+
                     var promise;
                     try {
                         promise = song.play();
                     } catch (e) {
+                        console.warn('Audio play call exception:', e);
                         audioInactive();
                         return;
                     }
@@ -2637,9 +2643,9 @@ btn_gift.onclick = function(){
                                     song.currentTime = loopStartTime;
                                 }
                             } catch (e) {}
-                            fadeAudio(1, fadeDuration);
                             audioActive();
-                        }).catch(function () {
+                        }).catch(function (err) {
+                            console.warn('Audio play promise rejected:', err);
                             audioInactive();
                         });
                     } else {
@@ -2648,7 +2654,6 @@ btn_gift.onclick = function(){
                                 song.currentTime = loopStartTime;
                             }
                         } catch (e) {}
-                        fadeAudio(1, fadeDuration);
                         audioActive();
                     }
                 }
@@ -2720,6 +2725,11 @@ btn_gift.onclick = function(){
                 var btnOpenEl = document.getElementById('btn_open');
                 if (btnOpenEl) {
                     btnOpenEl.addEventListener('click', onOpenInvitation);
+                    btnOpenEl.addEventListener('touchend', function() {
+                        if (!invitationOpened) {
+                            onOpenInvitation();
+                        }
+                    }, { passive: true });
                 }
 
                 if (window.jQuery) {
@@ -2904,18 +2914,18 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('.motionSection .elementor-background-video-container video').removeAttribute('autoplay');
 });
 
-if (typeof elementorFrontendConfig === 'undefined') {
-    disableScrolling();
-    document.body.style.height = "100vh";
-    btn_open.onclick = function() {
+disableScrolling();
+document.body.style.height = "100vh";
+
+if (btn_open) {
+    btn_open.addEventListener('click', function() {
         enableScrolling();
         closeCover();
         myFunction();
         if (typeof window.playAudio === 'function') {
             window.playAudio();
         }
-    };
-
+    });
 }
 
 function myFunction() {
