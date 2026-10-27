@@ -2160,8 +2160,8 @@ btn_gift.onclick = function(){
                 
                                         
                     <audio id="song" loop="" preload="auto" playsinline webkit-playsinline>
-                        <source src="MUARA%20-%20Adera%20(Official%20Video)%20%5BRm8UZWKFC2Y%5D.mp3?v=2" type="audio/mp3">
-                        <source src="MUARA - Adera (Official Video) [Rm8UZWKFC2Y].mp3?v=2" type="audio/mp3">
+                        <source src="Rossa%20feat.%20Afgan%20-%20Kamu%20Yang%20Kutunggu%20Official%20Music%20Video.mp3?v=4" type="audio/mp3">
+                        <source src="Rossa feat. Afgan - Kamu Yang Kutunggu Official Music Video.mp3?v=4" type="audio/mp3">
                     </audio>
 
                 
@@ -2193,7 +2193,7 @@ btn_gift.onclick = function(){
             var ytReady = false;
             var ytShouldPlay = true;
 
-            var songStartSetting = "04:38";
+            var songStartSetting = "02:07";
             var songEndSetting = "";
             var invitationOpened = false;
             var youtubeStartSetting = "";
@@ -2609,12 +2609,29 @@ btn_gift.onclick = function(){
                         pauseTimer = null;
                     }
 
-                    if (isFirstPlay) {
+                    var initialSeekDone = false;
+                    function ensureStartTime() {
+                        if (loopStartTime > 0 && !initialSeekDone) {
+                            try {
+                                if (song.currentTime < (loopStartTime - 1)) {
+                                    song.currentTime = loopStartTime;
+                                }
+                                if (Math.abs(song.currentTime - loopStartTime) <= 2) {
+                                    initialSeekDone = true;
+                                }
+                            } catch (e) {}
+                        }
+                    }
+
+                    if (!initialSeekDone && loopStartTime > 0) {
                         try {
                             song.currentTime = loopStartTime;
+                            if (Math.abs(song.currentTime - loopStartTime) <= 2) {
+                                initialSeekDone = true;
+                            }
                         } catch (e) {}
-                        isFirstPlay = false;
                     }
+                    isFirstPlay = false;
 
                     if (!song.paused) {
                         audioActive();
@@ -2638,22 +2655,14 @@ btn_gift.onclick = function(){
 
                     if (promise && typeof promise.then === 'function') {
                         promise.then(function () {
-                            try {
-                                if (song.currentTime < (loopStartTime - 1)) {
-                                    song.currentTime = loopStartTime;
-                                }
-                            } catch (e) {}
+                            ensureStartTime();
                             audioActive();
                         }).catch(function (err) {
                             console.warn('Audio play promise rejected:', err);
                             audioInactive();
                         });
                     } else {
-                        try {
-                            if (song.currentTime < (loopStartTime - 1)) {
-                                song.currentTime = loopStartTime;
-                            }
-                        } catch (e) {}
+                        ensureStartTime();
                         audioActive();
                     }
                 }
@@ -2695,13 +2704,9 @@ btn_gift.onclick = function(){
                 window.pauseAudio = nativePauseAudio;
                 window.toggleAudio = toggleNativeAudio;
 
-                song.addEventListener('loadedmetadata', function () {
-                    try {
-                        if (loopStartTime > 0 && isFirstPlay) {
-                            song.currentTime = loopStartTime;
-                        }
-                    } catch (e) {}
-                });
+                song.addEventListener('loadedmetadata', ensureStartTime);
+                song.addEventListener('canplay', ensureStartTime);
+                song.addEventListener('playing', ensureStartTime);
 
                 song.addEventListener('timeupdate', function () {
                     if (loopEndTime !== null && song.currentTime >= (loopEndTime - 0.05)) {
